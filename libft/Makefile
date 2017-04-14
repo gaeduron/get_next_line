@@ -83,7 +83,7 @@ CC = -Wall -Werror -Wextra
 
 OBJ = $(SRC:.c=.o)
 
-HEADER = .
+HEADER = includes
 
 VPATH = .
 
