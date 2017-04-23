@@ -6,50 +6,67 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 16:05:06 by gduron            #+#    #+#             */
-/*   Updated: 2017/04/23 00:46:36 by bduron           ###   ########.fr       */
+/*   Updated: 2017/04/23 23:50:10 by bduron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-t_gnl	init_gnl(t_gnl *gnl)
+t_gnl	*init_gnl(t_gnl *gnl)
 {
 	gnl = (t_gnl*)malloc(sizeof(t_gnl));
-	gnl->str_start = ft_strdup("");
+	gnl->s = ft_strdup("");
+	gnl->i = 0;
 	return (gnl);
 }
 
-int		waiting_line(t_gnl *gnl, char **line)
+int		waiting_line(t_gnl *g, char **line, char *buff)
 {
-	char	*next_nl;
+	long	nl;
 	
-	if (!(next_nl = ft_strchr(gnl->str, '\n')) && !ft_strlen(gnl->str))
+	if (buff[0] == 0)
+	{
+		!(buff = ft_strjoin(g->s, buff)) ? free(buff) : 0;
+		if (buff == 0)
+		    return (-1);
+		g->s = ft_strdup(buff);	
+	}
+	if (!(nl = ft_strchr(&(g->s[g->i]) , '\n') - g->s) && !ft_strlen(&(g->s[g->i])))
 		return (0);
-	!next_nl ? *line = ft_strdup(gnl->str) : \
-		*line = ft_strsub(gnl->str, 0, next_nl - gnl->str - 1);
-	gnl->str = next_nl + 1;
+	nl < 0 ? (*line = ft_strdup(&(g->s[g->i]))) : \
+		(*line = ft_strsub(g->s, g->i, nl - g->i));
+	nl > 0 ? (g->i = (nl + 1)) : 0;
+	//g->s[g->i] == '\n' ? g->i-- : 0;
 	return (1);
 }
 
+
+
+
+
 int		get_next_line(const int fd, char **line)
 {
-	static t_gnl	*gnl;
+	static t_gnl	*g;
+	char			*buff;
 	long			ret;
 
-	if (fd < 0 || !line || *line == 0 || BUFF_SIZE < 1 || \
+	if (fd < 0 || !line || BUFF_SIZE < 1 || \
 		!(buff = ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
-	gnl == 0 ? gnl = init_gnl(gnl) : 0;
-	while ((ret = read(fd, buff, BUFF_SIZE)) > 0 && !ft_strchr(gnl->str, '\n'))
+	g == 0 ? g = init_gnl(g) : 0;
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0 && \
+		(!ft_strchr(buff, '\n') ? 1 : (buff[ret] = 0)))
 	{
 		buff[ret] = '\0';
-		!(gnl->str = ft_strjoin(gnl->str, buff)) ? free(buff) : 0 ;
-		if (gnl->str == 0)
+		!(buff = ft_strjoin(g->s, buff)) ? free(buff) : 0;
+		if (buff == 0)
 			return (-1);
+		g->s = ft_strdup(buff);
 	}
-	if (waiting_line(gnl, line))
+	ft_strchr(buff, '\n') ? 0 : (buff[0] = 0) ;
+	if (waiting_line(g, line, buff))
 		return (1);
-	free(gnl->str_start);
+	free(g->s);
 	free(buff);
 	return (ret == 0 ? 0 : -1);
 }
