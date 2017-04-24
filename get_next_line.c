@@ -6,7 +6,7 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 16:05:06 by gduron            #+#    #+#             */
-/*   Updated: 2017/04/16 23:26:25 by bduron           ###   ########.fr       */
+/*   Updated: 2017/04/21 16:48:52 by gduron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ int		waiting_line(t_gnl *gnl, char **line)
 int		get_next_line(const int fd, char **line)
 {
 	static t_gnl	*gnl;
+	char			*buff;
 
 	if (fd < 0 || line == 0 || *line == 0 || BUFF_SIZE < 1)
 		return (-1);
@@ -50,16 +51,15 @@ int		get_next_line(const int fd, char **line)
         return (0);
 	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		gnl.str = read_loop(gnl.str, buff, ret);
-		if (gnl.str == 0)
+		gnl->str = read_loop(gnl->str, buff, ret);
+		if (gnl->str == 0)
 		{
 			free(buff);
 			return (-1);
 		}
-		
+		waiting_line(gnl, line);
 	}
 	free(gnl->str);
 	free(buff);
 	return (ret == 0 ? 0 : -1);
-
 }
