@@ -6,31 +6,43 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 16:05:06 by gduron            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2017/04/21 16:48:52 by gduron           ###   ########.fr       */
+=======
+/*   Updated: 2017/04/23 23:50:10 by bduron           ###   ########.fr       */
+>>>>>>> 33bef679c979df5fce162b752892a57d8ff46b92
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int 	find_next_newline(t_gnl *gnl)
+t_gnl	*init_gnl(t_gnl *gnl)
 {
-	int		i;
-
-	i = 0;
-	while (gnl->str[gnl->index + i] && gnl->str[gnl->index + i] == '\n')
-		i++;
+	gnl = (t_gnl*)malloc(sizeof(t_gnl));
+	gnl->s = ft_strdup("");
+	gnl->i = 0;
+	return (gnl);
 }
 
-int		waiting_line(t_gnl *gnl, char **line)
+int		waiting_line(t_gnl *g, char **line, char *buff)
 {
-	if (!find_next_newline(gnl))
-		return(0);
+	long	nl;
 	
-	*line = next_line(gnl->str);
-	return (1)
+	if (buff[0] == 0)
+	{
+		!(buff = ft_strjoin(g->s, buff)) ? free(buff) : 0;
+		if (buff == 0)
+		    return (-1);
+		g->s = ft_strdup(buff);	
+	}
+	if (!(nl = ft_strchr(&(g->s[g->i]) , '\n') - g->s) && !ft_strlen(&(g->s[g->i])))
+		return (0);
+	nl < 0 ? (*line = ft_strdup(&(g->s[g->i]))) : \
+		(*line = ft_strsub(g->s, g->i, nl - g->i));
+	nl > 0 ? (g->i = (nl + 1)) : 0;
+	//g->s[g->i] == '\n' ? g->i-- : 0;
+	return (1);
 }
-
-
 
 
 
@@ -38,28 +50,27 @@ int		waiting_line(t_gnl *gnl, char **line)
 
 int		get_next_line(const int fd, char **line)
 {
-	static t_gnl	*gnl;
+	static t_gnl	*g;
 	char			*buff;
+	long			ret;
 
-	if (fd < 0 || line == 0 || *line == 0 || BUFF_SIZE < 1)
+	if (fd < 0 || !line || BUFF_SIZE < 1 || \
+		!(buff = ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
-	if (gnl == 0)
-		init_gnl(gnl);
-	if (waiting_line(gnl, line))
-		return (1);
-    if (!(buff = (char*)malloc(sizeof(char) * (BUFF_SIZE + 1))))
-        return (0);
-	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
+	g == 0 ? g = init_gnl(g) : 0;
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0 && \
+		(!ft_strchr(buff, '\n') ? 1 : (buff[ret] = 0)))
 	{
-		gnl->str = read_loop(gnl->str, buff, ret);
-		if (gnl->str == 0)
-		{
-			free(buff);
+		buff[ret] = '\0';
+		!(buff = ft_strjoin(g->s, buff)) ? free(buff) : 0;
+		if (buff == 0)
 			return (-1);
-		}
-		waiting_line(gnl, line);
+		g->s = ft_strdup(buff);
 	}
-	free(gnl->str);
+	ft_strchr(buff, '\n') ? 0 : (buff[0] = 0) ;
+	if (waiting_line(g, line, buff))
+		return (1);
+	free(g->s);
 	free(buff);
 	return (ret == 0 ? 0 : -1);
 }
