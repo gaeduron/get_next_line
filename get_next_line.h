@@ -6,7 +6,7 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 15:57:40 by gduron            #+#    #+#             */
-/*   Updated: 2017/04/24 18:20:53 by gduron           ###   ########.fr       */
+/*   Updated: 2017/04/24 19:57:12 by gduron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int				get_next_line(const int fd, char **line);
 
 typedef struct	s_gnl
 {
-	long		i;
+	char		*tmp;
 	char		*s;
 }				t_gnl;
 # define BUFF_SIZE 1
