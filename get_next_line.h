@@ -21,6 +21,10 @@ typedef struct	s_gnl
 {
 	char		*tmp;
 	char		*s;
+	int		fd;
+	t_gnl		*head;	
+	t_gnl		*next;
+
 }				t_gnl;
 # define BUFF_SIZE 1
 #endif

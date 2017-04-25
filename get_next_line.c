@@ -12,11 +12,36 @@
 
 #include "get_next_line.h"
 
-t_gnl	*init_gnl(t_gnl *gnl)
+t_gnl	*add_or_find_gnl(t_gnl *head, int fd)
 {
+	t_gnl	*last;
+
+	last = head;
+	while (last && last->next)
+	{
+		if (last->fd == fd)
+			return (last);
+		last = last->next;
+	}
+	if (last && last->fd == fd)
+		return (last);
 	gnl = (t_gnl*)malloc(sizeof(t_gnl));
 	gnl->s = ft_strdup("");
 	gnl->tmp = 0;
+	gnl->next = 0;
+	gnl->fd = fd;
+	head ? gnl->head = head : gnl->head = gnl;
+	last ? last->next = gnl : 0;
+	return (gnl);
+}
+
+t_gnl		*init_or_finish_gnl(t_gnl *gnl, int fd, int init)
+{	
+	if (init)
+		return (add_or_find_gnl(gnl ? gnl->head : 0));
+	if (gnl)
+	free(gnl);
+	gnl = 0;	
 	return (gnl);
 }
 
@@ -40,13 +65,13 @@ int		waiting_line(t_gnl *g, char **line, char *nl)
 int		get_next_line(const int fd, char **line)
 {
 	static t_gnl	*g;
-	char			*buff;
-	long			ret;
+	char		*buff;
+	long		ret;
 
 	if (fd < 0 || !line || BUFF_SIZE < 1 || \
 			!(buff = ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
-	g == 0 ? g = init_gnl(g) : 0;
+	g = init_gnl(g ,fd) : 0;
 	while (((ret = read(fd, buff, BUFF_SIZE)) > 0 || g->s) && ret != -1)
 	{
 		buff[ret] = '\0';
@@ -59,8 +84,8 @@ int		get_next_line(const int fd, char **line)
 		if (ft_strchr(g->s, '\n') || !ret)
 			return (waiting_line(g, line, buff));
 	}
-	ret == -1 ? free(g->s) : 0 ;
-	free(g);
+	ret == -1 ? free(g->s) : 0;
+	g = init_gnl(g);
 	free(buff);
 	return (ret == 0 ? 0 : -1);
 }
