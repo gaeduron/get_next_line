@@ -6,7 +6,7 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 16:05:06 by gduron            #+#    #+#             */
-/*   Updated: 2017/04/25 20:25:54 by gduron           ###   ########.fr       */
+/*   Updated: 2017/04/26 10:57:26 by gduron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ t_gnl		*init_or_finish_gnl(t_gnl **gnl, int fd, int init, int ret)
 			tmp = tmp->next;
 		}
 	}
-	tmp = ((*gnl)->head != *gnl ? (*gnl)->head : 0);
+	tmp = ((*gnl)->head != *gnl ? (*gnl)->head : (*gnl)->next);
 	(*gnl)->last ? ((*gnl)->last->next = (*gnl)->next) : 0;
 	(*gnl)->next ? ((*gnl)->next->last = (*gnl)->last) : 0;
 	ret == -1 ? free((*gnl)->s) : 0;
