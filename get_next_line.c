@@ -6,7 +6,7 @@
 /*   By: gduron <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 16:05:06 by gduron            #+#    #+#             */
-/*   Updated: 2017/04/26 10:57:26 by gduron           ###   ########.fr       */
+/*   Updated: 2017/04/26 11:26:33 by gduron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,10 @@ t_gnl		*add_or_find_gnl(t_gnl *head, int fd)
 		last = curr;
 		curr = curr->next;
 	}
-	curr = (t_gnl*)malloc(sizeof(t_gnl));
-	curr->s = ft_strdup("");
+	if (!(curr = (t_gnl*)malloc(sizeof(t_gnl))))
+		return (0);
+	if (!(curr->s = ft_strdup("")))
+		return (0);
 	curr->tmp = 0;
 	curr->next = 0;
 	curr->fd = fd;
@@ -64,9 +66,13 @@ t_gnl		*init_or_finish_gnl(t_gnl **gnl, int fd, int init, int ret)
 int			waiting_line(t_gnl **g, char **line, char *nl, int ret)
 {
 	free(nl);
+	if (!(*g)->s)
+		return (-1);
 	nl = ft_strchr((*g)->s, '\n');
 	nl ? *line = ft_strsub((*g)->s, 0, nl - (*g)->s) : \
 		(*line = ft_strdup((*g)->s));
+	if (!(*line))
+		return (-1);
 	nl ? ((*g)->s = ft_memmove((*g)->s, nl + 1, ft_strlen(nl))) : 0;
 	if ((*g)->s[0] == 0 && !nl)
 	{
@@ -88,7 +94,8 @@ int			get_next_line(const int fd, char **line)
 	if (fd < 0 || !line || BUFF_SIZE < 1 || \
 			!(buff = ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
-	g = init_or_finish_gnl(&g, fd, 1, 0);
+	if (!(g = init_or_finish_gnl(&g, fd, 1, 0)))
+		return (-1);
 	while (((ret = read(fd, buff, BUFF_SIZE)) > 0 || g->s) && ret != -1)
 	{
 		buff[ret] = '\0';
